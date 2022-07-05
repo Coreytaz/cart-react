@@ -68,8 +68,17 @@ li > div > svg:hover {
 
 .count {
     margin-top: 10px;
-    font-size: 20px;
+    font-size: 16px;
     padding: 0 30px;
     display: flex;
     justify-content: space-between;
+}
+
+.discount {
+    background-color: red;
+    color: white;
+    padding: 5px;
+    border: 1px solid red;
+    border-radius: 50%;
+    text-decoration: line-through;
 }

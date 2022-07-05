@@ -9,6 +9,11 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import Typography from "@mui/material/Typography";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 function App() {
   const [cart, setCart] = React.useState([]);
   const [id, setId] = React.useState("");
@@ -17,6 +22,8 @@ function App() {
   const [idError, setIdError] = React.useState(false);
   const [nameError, setNameError] = React.useState(false);
   const [priceError, setPriceError] = React.useState(false);
+  const [discount, setDiscount] = React.useState("");
+  const [isDiscount, setIsDiscount] = React.useState(false);
 
   const addCart = () => {
     debugger;
@@ -80,6 +87,16 @@ function App() {
     ];
   }
 
+  function changeDiscount(values) {
+    if (values <= 100) {
+      return setDiscount(values.replace(/\D/g, ""));
+    }
+  }
+
+  function changeDiscountPrice(price) {
+    return (price * (1 - +discount / 100)).toFixed(0);
+  }
+
   return (
     <>
       <CssBaseline>
@@ -116,6 +133,49 @@ function App() {
               helperText={priceError ? "Цена пустая!" : " "}
             />
           </div>
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+              <Typography>Скидка</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography>
+                <Stack
+                  mt={2}
+                  mb={2}
+                  justifyContent="space-between"
+                  direction="row"
+                >
+                  <TextField
+                    id="outlined-basic"
+                    label="Скидка"
+                    variant="outlined"
+                    value={discount}
+                    onChange={(e) => changeDiscount(e.target.value)}
+                    disabled={isDiscount}
+                  />
+                  {isDiscount ? (
+                    <Button
+                      onClick={() => setIsDiscount(!isDiscount)}
+                      variant="contained"
+                    >
+                      Убрать скидки
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => setIsDiscount(!isDiscount)}
+                      variant="contained"
+                    >
+                      Установить скидку
+                    </Button>
+                  )}
+                </Stack>
+              </Typography>
+            </AccordionDetails>
+          </Accordion>
           <Stack mt={2} mb={2} justifyContent="center">
             <Button
               onClick={addCart}
@@ -137,9 +197,23 @@ function App() {
                       <span>ID: {item.id}</span>
                     </div>
                     <div>
-                      {item.price +
-                        " " +
-                        declOfNum(item.price, ["Рубль.", "Рубля.", "Рублей."])}
+                      <div>
+                        {isDiscount ? (
+                          <span className="discount">{item.price}</span>
+                        ) : (
+                          item.price +
+                          " " +
+                          declOfNum(item.price, ["Рубль.", "Рубля.", "Рублей."])
+                        )}{" "}
+                        {isDiscount &&
+                          changeDiscountPrice(item.price) +
+                            " " +
+                            declOfNum(changeDiscountPrice(item.price), [
+                              "Рубль.",
+                              "Рубля.",
+                              "Рублей.",
+                            ])}
+                      </div>
                       <DeleteIcon onClick={() => removeCart(item.id)} />
                     </div>
                   </li>
@@ -152,12 +226,29 @@ function App() {
               <div>Всего товаров: {cart.length}</div>
               <div>
                 Общая стоимость:{" "}
-                {cart.reduce((a, b) => a + Number(b.price), 0) +
+                {isDiscount ? (
+                  <span className="discount">
+                    {cart.reduce((a, b) => a + Number(b.price), 0)}
+                  </span>
+                ) : (
+                  cart.reduce((a, b) => a + Number(b.price), 0) +
                   " " +
                   declOfNum(
                     cart.reduce((a, b) => a + Number(b.price), 0),
                     ["Рубль.", "Рубля.", "Рублей."]
-                  )}
+                  )
+                )}{" "}
+                {isDiscount &&
+                  changeDiscountPrice(
+                    cart.reduce((a, b) => a + Number(b.price), 0)
+                  ) +
+                    " " +
+                    declOfNum(
+                      changeDiscountPrice(
+                        cart.reduce((a, b) => a + Number(b.price), 0)
+                      ),
+                      ["Рубль.", "Рубля.", "Рублей."]
+                    )}
               </div>
             </div>
           ) : (
