@@ -1,0 +1,4 @@
+# pnpm 12 configuration for this single-package application.
+packages:
+  - "."
+nodeLinker: isolated
